@@ -189,7 +189,7 @@ def split_tokens(line: str):
 
     for i, token in enumerate(tokens):
         
-        #Only test ops that can be unart
+        #Only test ops that can be unary
         if op_can_be_unary(token):
             #if any operator is the first or last token in a line, it must be unary
             if (i == 0) or (i == len(tokens)-1):
@@ -443,6 +443,9 @@ def execute_postfix(tokens, global_vars):
                 
                 args = []
                 for n in range(arg_count):
+                    if len(stack) == 0:
+                        return "ARGUMENT_ERROR:\n\"" + func_name + "\" has an argument with an invalid operation."
+                        
                     next_arg = get_value(stack[-1], global_vars)
                     del stack[-1]
 
