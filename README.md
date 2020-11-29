@@ -120,4 +120,4 @@ nthroot : Nth root, supplied by an argument
 
 * If you try to assign a number as if it were a variable nothing happens. It should throw an error.
 
-* There are no logical operators such ac && or ||
+* There are no logical operators such as && or ||
