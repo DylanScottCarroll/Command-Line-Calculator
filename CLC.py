@@ -535,6 +535,7 @@ while True:
     else:
         last_line = line
 
+    tokens = split_tokens(line)
     postfix = to_postfix(tokens)
     result = execute_postfix(postfix, global_vars)
     print(result)
