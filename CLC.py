@@ -239,16 +239,19 @@ def to_postfix(tokens: str):
                         del op_stack[-1]
                     else:
                         
-                        if op_stack[-1] == "(C":
-                            #place the function name and calling paren on the output stack
-                            output.append(op_stack[-2])
-                            output.append(op_stack[-1])
+                        if len(op_stack) > 0:
+                            if op_stack[-1] == "(C":
+                                #place the function name and calling paren on the output stack
+                                output.append(op_stack[-2])
+                                output.append(op_stack[-1])
+                                del op_stack[-1]
+                            
                             del op_stack[-1]
-                        
-                        del op_stack[-1]
 
-                        
-                        break
+                            
+                            break
+                        else:
+                            return "SYNTAX_ERROR:\nMissing parenthesis."
         
         #If token is not a paren and is an op
         elif token_is_op(token):
@@ -537,5 +540,12 @@ while True:
 
     tokens = split_tokens(line)
     postfix = to_postfix(tokens)
+
+    #If postfix threw an error
+    if type(postfix) == str:
+        print(postfix)
+        continue
+
+    print(postfix)
     result = execute_postfix(postfix, global_vars)
     print(result)
