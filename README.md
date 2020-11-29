@@ -6,15 +6,15 @@ I wrote this because I seldom used the Windows calculator and instead typed calc
 
 **The basic features include:**
 
-*Standard scientific calculator operations 
+* Standard scientific calculator operations 
 
-*Functions
+* Functions
 
-*Boolean comparison operators
+* Boolean comparison operators
 
-*Variables
+* Variables
 
-*Assignment operators
+* Assignment operators
 
 
 **Operators:**
@@ -112,14 +112,14 @@ nthroot : Nth root, supplied by an argument
 
 **Known Issues**
 
-*Functions were hacked together. It does not check if you supplied the correct number of arguments and will select values outside of the function call in unpredictable ways if not enough arguments are given.
+* Functions were hacked together. It does not check if you supplied the correct number of arguments and will select values outside of the function call in unpredictable ways if not enough arguments are given.
 
-*You can't use more than one unary operator in a row.
+* You can't use more than one unary operator in a row.
 
-*If you type just one number and hit enter, it prints the number twice.
+* If you type just one number and hit enter, it prints the number twice.
 
-*If you try to assign a number as if it were a variable
+* If you try to assign a number as if it were a variable
 
-*You can have decimal points in variable names
+* You can have decimal points in variable names
 
-*There are no logical operators such ac && or ||
+* There are no logical operators such ac && or ||
