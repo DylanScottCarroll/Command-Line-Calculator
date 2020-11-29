@@ -118,8 +118,6 @@ nthroot : Nth root, supplied by an argument
 
 * If you type just one number and hit enter, it prints the number twice.
 
-* If you try to assign a number as if it were a variable
-
-* You can have decimal points in variable names
+* If you try to assign a number as if it were a variable nothing happens. It should throw an error.
 
 * There are no logical operators such ac && or ||
