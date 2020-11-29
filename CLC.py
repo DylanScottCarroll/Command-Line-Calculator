@@ -605,6 +605,5 @@ while True:
         print(postfix)
         continue
 
-    print(postfix)
     result = execute_postfix(postfix, global_vars)
     print(result)
