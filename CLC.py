@@ -92,7 +92,7 @@ def char_type(char: str) -> str:
         return "etc"
 
 def token_is_not_operand(token, direction):
-    """Returns True if the token allows the adjacent token in the specified direction to be unary"""
+    """Returns True if the token in the given direction could not be part of an operand"""
 
     if direction == "left":
         return ( char_type(token[0]) == "ops" and not(token in [")", "++", "--", "!"] ) )
@@ -185,6 +185,7 @@ def split_tokens(line: str):
    
     #
     #TAG UNARY OPERATORS AND CALLING PARENS
+    #CHECK FOR ILLEGAL ADJACENT OPERANDS
     #
 
     for i, token in enumerate(tokens):
@@ -201,15 +202,19 @@ def split_tokens(line: str):
                     tokens[i] = token + "U"
             elif op_can_be_unary(token):
                 tokens[i] = token + "U"
-            
-                
-                
         
         #if an open paren comes after an operand, it calls that operand
         elif token == "(" and i !=0:
             #If the previous token is an operand
-            if not token_is_not_operand(tokens[i-1], ")"):
+            if not token_is_not_operand(tokens[i-1], "left"):
                 tokens[i] = token + "C"
+
+        #Check for adjacent operands
+        #If the current token is an operand
+        elif (char_type(token[0]) != "ops") and i !=0:
+             #And  the previous token is not an operand
+            if not token_is_not_operand(tokens[i-1], "left"):
+                return "SYNTAX_ERROR:\nCan't have adjecent operands without an operator."
 
     return tokens
 
@@ -586,6 +591,13 @@ while True:
         last_line = line
 
     tokens = split_tokens(line)
+    #If split_tokens threw an error
+    if type(tokens) == str:
+        print(tokens)
+        continue
+
+        print(tokens)
+
     postfix = to_postfix(tokens)
 
     #If postfix threw an error
