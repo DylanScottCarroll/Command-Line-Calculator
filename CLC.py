@@ -7,8 +7,8 @@
 import math
 
 NUMBER_CHARS = "1234567890."
-OP_CHARS = "=+-/*()%<>!^"
-WHITESPACE_CHARS = [",", " ", "\n", "\t", "\v", "\r", ""]
+OP_CHARS = "=+-/*()%<>!^,"
+WHITESPACE_CHARS = [" ", "\n", "\t", "\v", "\r", ""]
 
 MULTI_OPS = ["--", "++", "-=", "+=", "//", "==", ">=", "<=", "!="]
 
@@ -220,25 +220,63 @@ def to_postfix(tokens: str):
     output = []
     op_stack = []
 
-    for token in tokens:
-        #If token is a paren
-        if token in ["(", ")", "(C"]:
+    for i, token in enumerate(tokens):
+        #checking for operators that influence precedence
+        if token in ["(", ")", "(C", ","]:
             if token == "(":
                 op_stack.append(token)
             elif token == "(C":
                 #place the function name on the stack below the calling paren
-                op_stack.append(output[-1])
+                func_name = output[-1]
+                op_stack.append(func_name)
                 del output[-1]
-
                 op_stack.append(token)
+                
+
+                #check if the function exists
+                if not(func_name in FUNCTIONS.keys()):
+                    return "NAME_ERROR:\n\"" + func_name + "\" does not exist as a function."
+
+                #Look forward and count the arguments
+                args, func = FUNCTIONS[func_name]
+                balance = 1
+                count = 1
+                current_arg = []
+                for j in range(i+1, len(tokens)):
+                    ahead_token = tokens[j]
+                    if ahead_token == ",":
+                        if len(current_arg) == 0:
+                            return "ARGUMENT_ERROR:\nArgument " + str(count) + " of " + func_name + " is invalid."
+                        
+                        count += 1
+                    elif ahead_token == "(" or ahead_token == "(C":
+                        balance += 1
+                    elif ahead_token == ")":
+                        balance -= 1
+                    else:
+                        current_arg.append(ahead_token)
+                    
+                    if balance == 0:
+                        break
+                
+                if len(current_arg) == 0:
+                    return "ARGUMENT_ERROR:\nArgument " + str(count) + " of " + func_name + " is invalid."
+
+                if args != count:
+                    return ("ARGUMENT_ERROR:\n\"" + func_name + "\" takes " 
+                    + str(args) + " arguments.\nYou gave " + str(count) + ".\n")
+
+
+            #If it is a close paren or a comma, flush all of the operations until the open paren
             else:
                 #work down the stack until an open paren is found
                 while True:
+                    #Keep going until an open paren is found
                     if  len(op_stack)>0 and not(op_stack[-1] == "(" or op_stack[-1] == "(C"):
                         output.append(op_stack[-1])
                         del op_stack[-1]
-                    else:
-                        
+                    #Remove the open paren
+                    elif token == ")": 
                         if len(op_stack) > 0:
                             if op_stack[-1] == "(C":
                                 #place the function name and calling paren on the output stack
@@ -247,11 +285,14 @@ def to_postfix(tokens: str):
                                 del op_stack[-1]
                             
                             del op_stack[-1]
-
                             
                             break
                         else:
                             return "SYNTAX_ERROR:\nMissing parenthesis."
+                    #If it was a comma, jsut stop after the flush
+                    else:
+                        break
+
         
         #If token is not a paren and is an op
         elif token_is_op(token):
@@ -296,6 +337,9 @@ def set_value(token, value, global_vars):
     global_vars[token] = value
 
 def simple_op(stack, operator):
+    if len(stack) < 2:
+        return "SYNTAX_ERROR:\nNot enough operands."
+
     op2 = stack[-1]
     del stack[-1]
     op1 = stack[-1]
