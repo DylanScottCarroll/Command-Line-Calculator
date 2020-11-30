@@ -577,7 +577,8 @@ global_vars = {
     "tau" : math.tau,
     "inf" : math.inf,
     "True": 1,
-    "False": 0
+    "False": 0,
+    "@" : 0
 }
 
 print("Welcome to calculator.")
@@ -606,4 +607,5 @@ while True:
         continue
 
     result = execute_postfix(postfix, global_vars)
+    set_value("@", result, global_vars) #update the answer variable
     print(result)

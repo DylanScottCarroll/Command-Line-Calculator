@@ -17,6 +17,11 @@ I wrote this because I seldom used the Windows calculator and instead typed calc
 * Assignment operators
 
 
+**Variables**
+By default "pi", "tau", "e", "inf", "True", and "False" have their values set.
+"@" is a variable that holds the result of the previous calculation.
+Every character that isn't an operator can be used in a variable name.
+
 **Operators:**
 
 Normal Ones
