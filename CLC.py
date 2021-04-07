@@ -551,7 +551,7 @@ def execute_postfix(tokens, global_vars):
                 elif token == ("--", 1, 1, 5):
                     result = raw
                     set_variable(raw, op-1, global_vars)
-                elif token == ("--", 1, 1, 5):
+                elif token == ("++", 1, 1, 5):
                     result = raw
                     set_variable(raw, op+1, global_vars)
 
