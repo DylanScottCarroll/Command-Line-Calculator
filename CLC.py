@@ -428,7 +428,7 @@ def execute_postfix(tokens, global_vars):
         
         if type(token) == tuple:
             result = 0
-
+            error = None
             
             #FIND THE OPERATOR AND EXECUTE IT
                         
@@ -465,7 +465,7 @@ def execute_postfix(tokens, global_vars):
                 raw1 = stack[-1]
                 del stack[-1]
                 
-                set_variable(raw1, op2, global_vars)
+                error = set_variable(raw1, op2, global_vars)
 
                 result = raw1
 
@@ -514,16 +514,17 @@ def execute_postfix(tokens, global_vars):
                     result = int(op1 > op2)
                 elif token == ("+=", 2, 0, 0):
                     result = op1 + op2
-                    set_variable(raw1, result, global_vars)
+                    error = set_variable(raw1, result, global_vars)
                 elif token == ("-=" , 2, 0, 0):
                     result = raw1
-                    set_variable(raw1, op1 - op2, global_vars)
+                    error = set_variable(raw1, op1 - op2, global_vars)
                 elif token == ("*=" , 2, 0, 0):
                     result = raw1
-                    set_variable(raw1, op1 * op2, global_vars)
+                    error = set_variable(raw1, op1 * op2, global_vars)
                 elif token == ("/=" , 2, 0, 0):
                     result = raw1
-                    set_variable(raw1, op1 / op2, global_vars)
+                    error = set_variable(raw1, op1 / op2, global_vars)
+
 
             elif operand_count == 1:
                 raw = stack[-1]
@@ -542,10 +543,13 @@ def execute_postfix(tokens, global_vars):
                         result *= i
                 elif token == ("--", 1, 1, 5):
                     result = raw
-                    set_variable(raw, op-1, global_vars)
+                    error = set_variable(raw, op-1, global_vars)
                 elif token == ("++", 1, 1, 5):
                     result = raw
-                    set_variable(raw, op+1, global_vars)
+                    error = set_variable(raw, op+1, global_vars)
+
+            if(error):
+                return error
 
             stack.append(result)
         
@@ -577,7 +581,13 @@ def get_value(token, global_vars):
         return f"Error, \"{token}\" is not recognized."
 
 def set_variable(var, val, global_vars):
-    global_vars[var] = val
+    """Add a varialbe to global_vars with the name var and the value val.
+        var must be a valid variable name"""
+    
+    if type(var)==str and re.fullmatch("([A-z|_][A-z|_|0-9]*)", var):
+        global_vars[var] = val
+    else:
+        return f"Error: \"{var}\" is not a valid variable name."
 
 global_vars = {
     "pi" : math.pi,
