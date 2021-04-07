@@ -20,7 +20,6 @@ OPERATORS = [
 
     #Postfix Ops
     ("!", 1, 1, 5), #Factorial
-    ("%", 1, -1, 5), #Convert to percent
     ("--", 1, 1, 5),
     ("++", 1, 1, 5),
 
@@ -111,7 +110,7 @@ FUNCTIONS = {
     "loge"  : (1, math.log),
     "logbase" : (2, math.log),
     "sqrt" : (1, math.sqrt),
-    "root" : (2, (lambda x, n : x**(1.0/n)) ),
+    "root" : (2, (lambda x, n : n**(1.0/x)) ),
 }
 
 
@@ -212,7 +211,7 @@ class Parser():
                 return ["Op", "Ex", "Cp", "Re"]
             
             elif Parser.check_op_pos(token, -1):
-                return ["Pr", "V", "Re"]
+                return ["Pr", "Ex"]
             elif Parser.check_if_value(token):
                 return ["V", "Re"]
             else:
@@ -354,7 +353,6 @@ def replace_operators(terminal_vars: list):
                 string, n, p, r = get_matching_op("(")
                 function_call = (string, arg_count, p, r)
 
-                tokens.append("(")
                 tokens.append(function_call)
 
             else:
@@ -365,45 +363,57 @@ def replace_operators(terminal_vars: list):
             tokens.append(terminal.body)
     
     return tokens
-            
+
+def is_open_paren(token):
+    """For the purposes of conversion to postfix,
+        tests whether the token is either "(" or a operator tuple that contains a "(" """
+    if token == "(":
+        return True
+    elif type(token) == tuple:
+        return (token[0] == "(")
+    else:
+        return False
 
 def to_postfix(tokens):
     """Converts an in-order list of tokens into a postfix-formatted list
     using the shunting-yard algorithm"""
-    
+
     output = []
     op_stack = []
-
     for i, token in enumerate(tokens):
-        if type(token) == tuple:
 
-            while len(op_stack) != 0 and op_stack[-1] != "(" and token[3] <= op_stack[-1][3]:
-                output.append(op_stack[-1])
-                del op_stack[-1]
-
-            op_stack.append(token)
-
-        elif token == "(":
+        if is_open_paren(token) :
             op_stack.append(token)
         
         elif token == ")":
-            while len(op_stack) != 0 and op_stack[-1] != "(":
+            while len(op_stack) != 0 and (not is_open_paren(op_stack[-1])) :
                 output.append(op_stack[-1])
                 del op_stack[-1]
             
             if len(op_stack) == 0:
                 return "Error, unbalanced parenthesis encountered."
             
+            if type(op_stack[-1]) == tuple:
+                output.append(op_stack[-1])
+
             del op_stack[-1]
 
+
+        elif type(token) == tuple:
+            
+            while len(op_stack) != 0 and (not is_open_paren(op_stack[-1]) )  and token[3] <= op_stack[-1][3]:
+                output.append(op_stack[-1])
+                del op_stack[-1]
+
+            op_stack.append(token)
+
         elif token == ",":
-            while len(op_stack) != 0 and op_stack[-1] != "(":
+            while len(op_stack) != 0 and (not is_open_paren(op_stack[-1]) ):
                 output.append(op_stack[-1])
                 del op_stack[-1]
             
         else:
-            
-            output.append(token)
+            output.append(token)  
     
     while len(op_stack) != 0:
         output.append(op_stack[-1])
@@ -415,6 +425,8 @@ def execute_postfix(tokens, global_vars):
     stack = []
     for token in tokens:
 
+        
+        
         if type(token) == tuple:
             result = 0
 
@@ -426,8 +438,12 @@ def execute_postfix(tokens, global_vars):
             if string == "(":
                 arguments = []
                 for i in range(operand_count):
-                    arguments.append(stack[-1])
+                    raw_arg = stack[-1]
                     del stack[-1]
+                    arg = get_value(raw_arg, global_vars)
+
+                    arguments.append(arg)
+                    
                 arguments.reverse()
 
                 function_name = stack[-1]
@@ -523,8 +539,6 @@ def execute_postfix(tokens, global_vars):
                     result = 1
                     for i in range(1, op+1):
                         result *= i
-                elif token == ("%", 1, -1, 5):
-                    result = op / 100
                 elif token == ("--", 1, 1, 5):
                     result = raw
                     set_variable(raw, op-1, global_vars)
@@ -547,15 +561,17 @@ def execute_postfix(tokens, global_vars):
     return stack[-1]
 
 def get_value(token, global_vars):
-    """If token is a number, it returns that number,
-     if it's a variable in scope it gets the value,
-     otherwise, an error is returned"""
+    """If the value is already a valid operand, like a number or boolean, it's just returned
+        If it is a variable name, then its value is retrieved from global scope and returned"""
 
     if type(token) in [int, float]:
         return token
+
+    elif type(token) == bool:
+        return token
+    
     elif token in global_vars.keys():
         return global_vars[token]
-    
     else:
         return f"Error, \"{token}\" is not recognized."
 
@@ -567,8 +583,6 @@ global_vars = {
     "e" : math.e,
     "tau" : math.tau,
     "inf" : math.inf,
-    "True": 1,
-    "False": 0,
     "@" : 0
 }
 if __name__ == "__main__":
@@ -595,13 +609,14 @@ if __name__ == "__main__":
         if type(tokens) == str:
             print(tokens)
             continue
-        
 
         postfix = to_postfix(tokens)
         #If postfix threw an error
         if type(postfix) == str:
             print(postfix)
             continue
+
+        
 
         result = execute_postfix(postfix, global_vars)
         
