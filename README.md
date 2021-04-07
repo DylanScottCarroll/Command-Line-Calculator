@@ -113,16 +113,3 @@ logbase : Log of base n, supplied as an argument
 sqrt : Square root
 
 nthroot : Nth root, supplied by an argument 
-
-
-**Known Issues**
-
-* Functions were hacked together. It does not check if you supplied the correct number of arguments and will select values outside of the function call in unpredictable ways if not enough arguments are given.
-
-* You can't use more than one unary operator in a row.
-
-* If you type just one number and hit enter, it prints the number twice.
-
-* If you try to assign a number as if it were a variable nothing happens. It should throw an error.
-
-* There are no logical operators such as && or ||
