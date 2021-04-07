@@ -497,21 +497,21 @@ def execute_postfix(tokens, global_vars):
                 elif token == ("-", 2, 0, 2):
                     result = op1 - op2
                 elif token == ("&&", 2, 0, 2):
-                    result = op1 and op2
+                    result = int(op1 and op2)
                 elif token == ("||", 2, 0, 2):
-                    result = op1 or op2
+                    result = int(op1 or op2)
                 elif token == ("==", 2, 0, 1):
-                    result = op1 == op2
+                    result = int(op1 == op2)
                 elif token == ("<=", 2, 0, 1):
-                    result = op1 <= op2
+                    result = int(op1 <= op2)
                 elif token == (">=", 2, 0, 1):
-                    result = op1 >= op2
+                    result = int(op1 >= op2)
                 elif token == ("!=", 2, 0, 1):
-                    result = op1 != op2
+                    result = int(op1 != op2)
                 elif token == ("<", 2, 0, 1):
-                    result = op1 < op2
+                    result = int(op1 < op2)
                 elif token == (">", 2, 0, 1):
-                    result = op1 > op2
+                    result = int(op1 > op2)
                 elif token == ("+=", 2, 0, 0):
                     result = op1 + op2
                     set_variable(raw1, result, global_vars)
@@ -535,7 +535,7 @@ def execute_postfix(tokens, global_vars):
                 if token == ("-", 1, -1, 6):
                     result = -op
                 elif token == ("!", 1, -1, 6):
-                    result = not op
+                    result = int(not op)
                 elif token == ("!", 1, 1, 5):
                     result = 1
                     for i in range(1, op+1):
@@ -564,7 +564,6 @@ def execute_postfix(tokens, global_vars):
 def get_value(token, global_vars):
     """If the value is already a valid operand, like a number or boolean, it's just returned
         If it is a variable name, then its value is retrieved from global scope and returned"""
-
     if type(token) in [int, float]:
         return token
 
@@ -573,6 +572,7 @@ def get_value(token, global_vars):
     
     elif token in global_vars.keys():
         return global_vars[token]
+
     else:
         return f"Error, \"{token}\" is not recognized."
 
@@ -584,7 +584,9 @@ global_vars = {
     "e" : math.e,
     "tau" : math.tau,
     "inf" : math.inf,
-    "@" : 0
+    "@" : 0,
+    "true" : 1,
+    "false" : 0
 }
 if __name__ == "__main__":
     print("Welcome to calculator.")
