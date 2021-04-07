@@ -382,11 +382,6 @@ def to_postfix(tokens):
     op_stack = []
     for i, token in enumerate(tokens):
 
-        #print(output)
-        #print(op_stack)
-        #print(token)
-        #print()
-
         if is_open_paren(token) :
             op_stack.append(token)
         
@@ -424,17 +419,12 @@ def to_postfix(tokens):
         output.append(op_stack[-1])
         del op_stack[-1]
 
-    #print(output)
-    #print()
+    
     return output
 
 def execute_postfix(tokens, global_vars):
     stack = []
     for token in tokens:
-
-        #print(stack)
-        #print(token)
-        #print()
         
         if type(token) == tuple:
             result = 0
@@ -491,7 +481,9 @@ def execute_postfix(tokens, global_vars):
                 del stack[-1]
                 if type(op1) == str:
                     return op1
-
+                
+                if token == ("^", 2, 0, 4):
+                    result = op1 ** op2
                 if token == ("*", 2, 0, 3):
                     result = op1 * op2
                 elif token == ("/", 2, 0, 3):
@@ -624,7 +616,6 @@ if __name__ == "__main__":
             print(postfix)
             continue
 
-        #print(postfix)
 
         result = execute_postfix(postfix, global_vars)
         
