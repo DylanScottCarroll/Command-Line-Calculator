@@ -501,11 +501,23 @@ def execute_postfix(tokens, global_vars):
                 if token == ("*", 2, 0, 3):
                     result = op1 * op2
                 elif token == ("/", 2, 0, 3):
-                    result = op1 / op2
+                    try:
+                        result = op1 / op2
+                    except ZeroDivisionError:
+                        return "Error: Cannot divide by zero, silly guy."
+
                 elif token == ("//", 2, 0, 3):
-                    result = op1 // op2
+                    try:
+                        result = op1 // op2
+                    except ZeroDivisionError:
+                        return "Error: Cannot divide by zero, silly guy."
+
                 elif token == ("%", 2, 0, 3):
-                    result = op1 % op2
+                    try:
+                        result = op1 % op2
+                    except ZeroDivisionError:
+                        return "Error: Cannot divide by zero, silly guy."
+
                 elif token == ("+", 2, 0, 2):
                     result = op1 + op2
                 elif token == ("-", 2, 0, 2):
@@ -536,8 +548,11 @@ def execute_postfix(tokens, global_vars):
                     result = raw1
                     error = set_variable(raw1, op1 * op2, global_vars)
                 elif token == ("/=" , 2, 0, 0):
-                    result = raw1
-                    error = set_variable(raw1, op1 / op2, global_vars)
+                    try:
+                        result = raw1
+                        error = set_variable(raw1, op1 / op2, global_vars)
+                    except ZeroDivisionError:
+                        return "Error: Cannot divide by zero, silly guy."
 
 
             elif operand_count == 1:
