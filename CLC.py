@@ -6,7 +6,7 @@
 
 import math, re
 
-TOKENIZATION_REGEX = "(([0-9|.]{1,})|([A-z|_|@][A-z|_|0-9|@]*)|([\-|!|\+|\*|\||\/|&|=|<|>|!]){1,2}|([\(|\)|\^|%|,]))"
+TOKENIZATION_REGEX = "(([0-9|.]+)|([A-Za-z|_|@][A-Za-z|_|0-9|@]*)|([\-|!|\+|\*|\||\/|&|=|<|>|!]){1,2}|([\(|\)|\^|%|,]))"
 VALUE_REGEX = "[0-9|.]{1,}|[A-z|_|@][A-z|_|0-9|@]*"
 
 
@@ -148,6 +148,7 @@ class Parser():
 
     def parse(self):
         """Parses the body of the parser"""
+
         if self.body == []:
             if not self.is_nullable():
                 return "Error: Unexpected end of expression."
