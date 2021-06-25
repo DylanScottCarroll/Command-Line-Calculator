@@ -21,7 +21,8 @@ I wrote this because I seldom used the Windows calculator and instead typed calc
 By default "pi", "tau", "e", "inf", "true", and "false" have their values set.
 Booleans are represented by true=1 and false=0.
 "@" is a variable that holds the result of the previous calculation.
-Every character that isn't an operator can be used in a variable name.
+Starting an expression with an operator will leave @ as an implicit first operand.
+a-z, A-Z, _, and 0-9 can be used in varialbe names, but they cannot start with 0-9.
 
 **Operators:**
 
@@ -79,8 +80,6 @@ Boolean Operators
 
 
 **Functions**
-
-Trig
 
 sin   : Sine
 

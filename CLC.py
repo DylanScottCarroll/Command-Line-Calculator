@@ -165,12 +165,14 @@ class Parser():
             else:
                 return f"Error: {self.body[0]} is not a valid terminal."
 
+        
         body_len = 0
         remaining_body = self.body[:]
-
         
         #Find what this var subsitutes out to given the first token in its body
         children_vars = Parser.find_sub(self.var, self.body[0])
+        
+        #Return if there is an error
         if type(children_vars) == str:
             return children_vars
 
@@ -182,6 +184,8 @@ class Parser():
             
             parse_result = new_parser.parse()
 
+
+            #Return if there is an error
             if type(parse_result) == str:
                 return parse_result
 
@@ -205,6 +209,12 @@ class Parser():
     @staticmethod
     def find_sub(var, token):
         """A lookup table that returns what the substitution will be for any given var with a first token of token"""
+
+        if var == "Mn":
+            if Parser.check_op_pos(token, 0):
+                return ["In", "Ex"]
+            else:
+                return ["Ex"]
 
         if var == "Ex":
             if token == "(":
@@ -306,7 +316,7 @@ class Parser():
 def parse(tokens : list):
     """Pareses a list of tokens into a parse tree"""
     terminal_list = []
-    parser = Parser("Ex", tokens, terminal_list)
+    parser = Parser("Mn", tokens, terminal_list)
     parse_result = parser.parse()
 
     string = ""
@@ -326,6 +336,10 @@ def replace_operators(terminal_vars: list):
     for terminal in terminal_vars:
         
         if terminal.var in ["Pr", "In", "Po"]:
+            
+            if terminal.parent.var == "Mn":
+                tokens.append("@")
+            
             position = Parser.get_operand_position(terminal)
             match = get_matching_op(terminal.body, position=position)
 
@@ -584,7 +598,7 @@ def set_variable(var, val, global_vars):
     """Add a varialbe to global_vars with the name var and the value val.
         var must be a valid variable name"""
     
-    if type(var)==str and re.fullmatch("([A-z|_][A-z|_|0-9]*)", var):
+    if type(var)==str and re.fullmatch("([A-z|_|@][A-z|_|0-9|@]*)", var):
         global_vars[var] = val
     else:
         return f"Error: \"{var}\" is not a valid variable name."
@@ -598,6 +612,7 @@ global_vars = {
     "true" : 1,
     "false" : 0
 }
+
 if __name__ == "__main__":
     print("Welcome to calculator.")
     last_line = ""
