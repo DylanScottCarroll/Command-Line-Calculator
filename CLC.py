@@ -625,7 +625,8 @@ global_vars = {
     "inf" : math.inf,
     "@" : 0,
     "true" : 1,
-    "false" : 0
+    "false" : 0,
+    "inf" : float("inf")
 }
 
 if __name__ == "__main__":
