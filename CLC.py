@@ -235,6 +235,8 @@ class Parser():
         if var == "Mn":
             if token == "(":
                 return ["Ex"]
+            elif Parser.check_op_pos(token, -1):
+                return ["Pr", "Ex"]
             elif Parser.check_op_pos(token, 0):
                 return ["In", "Ex"]
             else:
@@ -675,6 +677,7 @@ if __name__ == "__main__":
 
         tokens = replace_operators(terminal_vars)
 
+
         if type(tokens) == str:
             print(tokens)
             continue
@@ -684,7 +687,6 @@ if __name__ == "__main__":
         if type(postfix) == str:
             print(postfix)
             continue
-
 
         result = execute_postfix(postfix, global_vars)
         
