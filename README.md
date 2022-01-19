@@ -118,3 +118,7 @@ logbase : Log of base n, supplied as an argument
 sqrt : Square root
 
 root : Nth root, supplied by an argument 
+
+dot2 : Takes dot product of two 2d vectors (x1, y1, x2, y2)
+
+dot3 : Takes dot product of two 3d vectors (x1, y1, z1, x2, y2, z2)

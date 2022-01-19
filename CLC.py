@@ -87,6 +87,18 @@ def get_multichar_ops():
     return ops
 
 
+def Perm(n, r):
+    return math.factorial(n) // (math.factorial(n-r))
+    
+def Chose(n, r):
+    return math.factorial(n) // (math.factorial(n-r) * math.factorial(r))
+
+def dot2(ax, ay, bx, by):
+    return ax*bx + ay*by
+
+def dot3(ax, ay, az, bx, by, bz):
+    return ax*bx + ay*by + az*bz
+
 #The dictionary stores a tuple with the numver of arguments a function has
 #   and the function that it calls
 FUNCTIONS = {
@@ -111,7 +123,16 @@ FUNCTIONS = {
     "logbase" : (2, math.log),
     "sqrt" : (1, math.sqrt),
     "root" : (2, (lambda x, n : n**(1.0/x)) ),
+    "perm" : (2, Perm),
+    "chose" : (2, Chose),
+
+    "dot2" : (4, dot2),
+    "dot3" : (6, dot3),
+    
 }
+
+
+
 
 
 def tokenize(line: str):
@@ -212,7 +233,9 @@ class Parser():
         """A lookup table that returns what the substitution will be for any given var with a first token of token"""
 
         if var == "Mn":
-            if Parser.check_op_pos(token, 0):
+            if token == "(":
+                return ["Ex"]
+            elif Parser.check_op_pos(token, 0):
                 return ["In", "Ex"]
             else:
                 return ["Ex"]
@@ -463,6 +486,9 @@ def execute_postfix(tokens, global_vars):
                 function_name = stack[-1]
                 del stack[-1]
 
+                if function_name not in FUNCTIONS.keys():
+                    return f"Error: The function, \"{function_name}\", is not a known function name"
+                    
                 expected_args, function = FUNCTIONS[function_name]
 
                 if expected_args != operand_count:
@@ -568,11 +594,11 @@ def execute_postfix(tokens, global_vars):
                 elif token == ("!", 1, -1, 6):
                     result = int(not op)
                 elif token == ("!", 1, 1, 5):
-                    result = 1
-                    for i in range(1, op+1):
-                        result *= i
+                    if int(op) != op:
+                        return "Error: Factorial only supports integer operands." 
+                    result = math.factorial(op)
                 elif token == ("--", 1, 1, 5):
-                    result = raw
+                    result = raw    
                     error = set_variable(raw, op-1, global_vars)
                 elif token == ("++", 1, 1, 5):
                     result = raw
