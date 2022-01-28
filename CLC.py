@@ -99,6 +99,20 @@ def dot2(ax, ay, bx, by):
 def dot3(ax, ay, az, bx, by, bz):
     return ax*bx + ay*by + az*bz
 
+def mag(x, y, z):
+    return math.sqrt(x**2 + y**2 + z**2)
+
+def vecangle(ax, ay, az, bx, by, bz):
+    return math.acos( (dot3(ax, ay, az, bx, by, bz)) / (mag(ax, ay, az) * mag(bx, by, bz)) )
+
+def cross(ax, ay, az, 
+          bx, by, bz):
+
+        print("<", end="")
+        print(ay*bz-az*by, az*bx-ax*bz, ax*by-ay*bx, sep="," , end=">\nmag: ")
+    
+        return mag(ay*bz-az*by, az*bx-ax*bz, ax*by-ay*bx)
+
 #The dictionary stores a tuple with the numver of arguments a function has
 #   and the function that it calls
 FUNCTIONS = {
@@ -128,7 +142,9 @@ FUNCTIONS = {
 
     "dot2" : (4, dot2),
     "dot3" : (6, dot3),
-    
+    "mag" : (3, mag),
+    "vecangle" : (6, vecangle),
+    "cross" : (6, cross)
 }
 
 
