@@ -117,6 +117,8 @@ def cross(ax, ay, az,
 #The dictionary stores a tuple with the numver of arguments a function has
 #   and the function that it calls
 FUNCTIONS = {
+    "exit" : (0, exit),
+
     "sin" : (1, math.sin),
     "cos" : (1, math.cos),
     "tan" : (1, math.tan),
