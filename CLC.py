@@ -4,7 +4,7 @@
 #
 # A shell-interface for a calculator
 
-import math, re
+import math, re, readline
 
 TOKENIZATION_REGEX = r"(([0-9|.]+)|([A-Za-z|_|@][A-Za-z|_|0-9|@]*)|([\-|!|\+|\*|\||\/|&|=|<|>|!]){1,2}|([\(|\)|\^|%|,]))"
 VALUE_REGEX = r"[0-9|.]{1,}|[A-z|_|@][A-z|_|0-9|@]*"
