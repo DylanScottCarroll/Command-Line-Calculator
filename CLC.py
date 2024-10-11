@@ -6,8 +6,9 @@
 
 import math, re
 
-TOKENIZATION_REGEX = "(([0-9|.]+)|([A-Za-z|_|@][A-Za-z|_|0-9|@]*)|([\-|!|\+|\*|\||\/|&|=|<|>|!]){1,2}|([\(|\)|\^|%|,]))"
-VALUE_REGEX = "[0-9|.]{1,}|[A-z|_|@][A-z|_|0-9|@]*"
+TOKENIZATION_REGEX = r"(([0-9|.]+)|([A-Za-z|_|@][A-Za-z|_|0-9|@]*)|([\-|!|\+|\*|\||\/|&|=|<|>|!]){1,2}|([\(|\)|\^|%|,]))"
+VALUE_REGEX = r"[0-9|.]{1,}|[A-z|_|@][A-z|_|0-9|@]*"
+
 
 
 #(Operator string, number of operands, prefix=-1 infix=0 postfix=1, precedence)
@@ -172,7 +173,7 @@ def tokenize(line: str):
 
     return fixed_tokens
 
-class Parser():
+class ParseNode():
     def __init__(self, var, body, terminal_list, parent=None):
         self.var = var
         self.body = body
@@ -193,7 +194,7 @@ class Parser():
                 return 0
 
         if self.is_terminal():
-            if Parser.check_terminal(self.var, self.body[0]):
+            if ParseNode.check_terminal(self.var, self.body[0]):
 
                 self.body = self.body[0]
                 
@@ -208,7 +209,7 @@ class Parser():
         remaining_body = self.body[:]
         
         #Find what this var subsitutes out to given the first token in its body
-        children_vars = Parser.find_sub(self.var, self.body[0])
+        children_vars = ParseNode.find_sub(self.var, self.body[0])
         
         #Return if there is an error
         if type(children_vars) == str:
@@ -218,7 +219,7 @@ class Parser():
         #Pass the remaining body onto the next one.
 
         for child_var in children_vars:
-            new_parser = Parser(child_var, remaining_body, self.terminal_list, self)
+            new_parser = ParseNode(child_var, remaining_body, self.terminal_list, self)
             
             parse_result = new_parser.parse()
 
@@ -251,9 +252,9 @@ class Parser():
         if var == "Mn":
             if token == "(":
                 return ["Ex"]
-            elif Parser.check_op_pos(token, -1):
+            elif ParseNode.check_op_pos(token, -1):
                 return ["Pr", "Ex"]
-            elif Parser.check_op_pos(token, 0):
+            elif ParseNode.check_op_pos(token, 0):
                 return ["In", "Ex"]
             else:
                 return ["Ex"]
@@ -262,9 +263,9 @@ class Parser():
             if token == "(":
                 return ["Op", "Ex", "Cp", "Re"]
             
-            elif Parser.check_op_pos(token, -1):
+            elif ParseNode.check_op_pos(token, -1):
                 return ["Pr", "Ex"]
-            elif Parser.check_if_value(token):
+            elif ParseNode.check_if_value(token):
                 return ["V", "Re"]
             else:
                 return f"Error: {token} cannot begin an expression"
@@ -272,9 +273,9 @@ class Parser():
         elif var == "Re":
             if token == "(":
                 return ["Fc", "Re"]
-            elif Parser.check_op_pos(token, 0):
+            elif ParseNode.check_op_pos(token, 0):
                 return ["In", "Ex"]
-            elif Parser.check_op_pos(token, 1):
+            elif ParseNode.check_op_pos(token, 1):
                 return ["Po", "Re"]
             else:
                 return []
@@ -286,7 +287,7 @@ class Parser():
                 return f"Error: {token} cannot begin a function call"
         
         elif var == "Fb":
-            if token == "(" or Parser.check_op_pos(token, -1) or Parser.check_if_value(token):
+            if token == "(" or ParseNode.check_op_pos(token, -1) or ParseNode.check_if_value(token):
                 return ["Ex", "Fa"]
             elif token == ")":
                 return []
@@ -294,7 +295,7 @@ class Parser():
                 return f"Error: {token} cannot begin a function body."
 
         elif var == "Fr":
-            if token == "(" or Parser.check_op_pos(token, -1) or Parser.check_if_value(token):
+            if token == "(" or ParseNode.check_op_pos(token, -1) or ParseNode.check_if_value(token):
                 return ["Ex", "Fa"]
             else:
                 return f"Error: {token} cannot begin a function argument."
@@ -329,13 +330,13 @@ class Parser():
     def check_terminal(var, token):
         """Returns true if the given var matches the given token"""
         if var == "Pr":
-            return Parser.check_op_pos(token, -1)
+            return ParseNode.check_op_pos(token, -1)
         elif var == "In":
-            return Parser.check_op_pos(token, 0)
+            return ParseNode.check_op_pos(token, 0)
         elif var == "Po":
-            return Parser.check_op_pos(token, 1)  
+            return ParseNode.check_op_pos(token, 1)  
         elif var == "V":
-            return Parser.check_if_value(token)
+            return ParseNode.check_if_value(token)
         elif var == "Op":
             return token == "("
         elif var == "Cp":
@@ -358,7 +359,7 @@ class Parser():
 def parse(tokens : list):
     """Pareses a list of tokens into a parse tree"""
     terminal_list = []
-    parser = Parser("Mn", tokens, terminal_list)
+    parser = ParseNode("Mn", tokens, terminal_list)
     parse_result = parser.parse()
 
     string = ""
@@ -382,7 +383,7 @@ def replace_operators(terminal_vars: list):
             if terminal.parent.var == "Mn":
                 tokens.append("@")
             
-            position = Parser.get_operand_position(terminal)
+            position = ParseNode.get_operand_position(terminal)
             match = get_matching_op(terminal.body, position=position)
 
             if type(match) == list:
@@ -629,10 +630,10 @@ def execute_postfix(tokens, global_vars):
         
         else:
             #Is an integer
-            if re.fullmatch("[0-9]{1,}", token):
+            if re.fullmatch(r"[0-9]{1,}", token):
                 stack.append(int(token))
             #Is a float
-            elif re.fullmatch("[0-9]*\.[0-9]{1,}", token):
+            elif re.fullmatch(r"[0-9]*\.[0-9]{1,}", token):
                 stack.append(float(token))
             else:
                 stack.append(token)
